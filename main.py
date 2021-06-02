@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from sklearn import metrics
 import matplotlib.pyplot as plt
-import csv
 import cv2
 import numpy as np
 import json
@@ -191,7 +190,7 @@ def parse_dir(path=''):
     for root, dirs, files in os.walk(path):
         for filename in sorted(files):
             if(filename[0] != '.'):
-                filepath = path+'\\'+filename
+                filepath = path+'/'+filename
                 l.append(filepath)
                 l2.append(filename)
                 filepath = ''
@@ -280,7 +279,7 @@ def processo():
     imgcrop = crop(l_crop)
     dest = input("Inserisci il percorso di destinazione: ")
     nome = input("inserisci il nome: ")
-    dest = dest+"\\"+nome+".jpg"
+    dest = dest+"/"+nome+".jpg"
     """sr = cv2.dnn_superres.DnnSuperResImpl_create()
     path = "/Users/De_Filippo/PycharmProjects/provapy3/mod/EDSR_x4.pb"
     sr.readModel(path)
@@ -301,11 +300,11 @@ def processoscript(jsonpathdir, imagepathdir, dest):
         parts = from_json_to_list(l[i])
         img = cv2.imread(l2[i])
         img2, l_crop = bounding_box(img, parts)
-        cv2.imshow("titt", img2)
+        #cv2.imshow("titt", img2)
         cv2.waitKey(0)
         imgcrop = crop(l_crop)
         for x in range(len(imgcrop)):
-            dest = dest+"\\"+lname[i][:-15]+"sog_"+str(x)+".jpg"
+            dest = dest+"/"+lname[i][:-15]+"sog_"+str(x)+".jpg"
             imgcrop[x].save(dest)
             dest = dest2
 
@@ -411,8 +410,8 @@ def score(pathcsv, mode, titds):
 
 
 if __name__ == "__main__":
-    processoscript(jsonpathdir="C:\\Users\\giuse\\Desktop\\SOA\\JSON",
-                   imagepathdir="C:\\Users\\giuse\\Desktop\\SOA\\IMAGE", dest="C:\\Users\\giuse\\Desktop\\SOA\\RESULT")
+    processoscript(jsonpathdir="/root/Progetto_SOA/JSON",
+                   imagepathdir="/root/Progetto_SOA/IMAGE", dest="/root/Progetto_SOA/RESULT")
     # score("/Users/De_Filippo/Desktop/esperimentoMARKET-1501/scorefile.csv","02","MARKET-1501")
 
     """scorec3,truec3= arraycorr("/Users/De_Filippo/Desktop/esCHUCK-03/scorefile.csv","02")
