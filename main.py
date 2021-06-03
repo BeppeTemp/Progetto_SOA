@@ -105,8 +105,6 @@ def bounding_box(img, l=[]):
     y = 0
     for x in range(people):
         for y in range(len(l[x])):
-            print(y)
-            print(len(l[x]))
             # controllo le occlusioni
             """if(((l[x][y][0]==0)and (l[x][y][1]==0))or((l[x][y+1][0]==0)and (l[x][y+1][1]==0))):
                 continue"""
@@ -296,7 +294,7 @@ def processoscript(jsonpathdir, imagepathdir, dest):
     l, lname = parse_dir(jsonpathdir)
     l2, l2name = parse_dir(imagepathdir)
     dest2 = dest
-    for i in range(len(l)):
+    for i in range(len(l2)):
         parts = from_json_to_list(l[i])
         img = cv2.imread(l2[i])
         img2, l_crop = bounding_box(img, parts)
