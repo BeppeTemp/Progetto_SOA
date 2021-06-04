@@ -2,7 +2,6 @@ import math
 import pandas as pd
 import numpy as np
 from sklearn import metrics
-import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import json
@@ -10,8 +9,9 @@ import os
 from PIL import Image
 import pandas as pd
 import math
+import time
+from time import gmtime, strftime
 from sklearn import metrics
-import matplotlib.pyplot as plt
 
 
 def from_json_to_list(path):
@@ -303,8 +303,11 @@ def processoscript(jsonpathdir, imagepathdir, dest):
         imgcrop = crop(l_crop)
         for x in range(len(imgcrop)):
             dest = dest+"/"+lname[i][:-15]+"sog_"+str(x)+".jpg"
+	    if i % 50000 == 0:
+		print(i)
             imgcrop[x].save(dest)
             dest = dest2
+	strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
 
 
 def arraycorr(filepath, str):
@@ -408,8 +411,8 @@ def score(pathcsv, mode, titds):
 
 
 if __name__ == "__main__":
-    processoscript(jsonpathdir="/root/Progetto_SOA/JSON",
-                   imagepathdir="/root/Progetto_SOA/IMAGE", dest="/root/Progetto_SOA/RESULT")
+    processoscript(jsonpathdir="/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/JSON",
+                   imagepathdir="/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/IMAGE", dest="/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/RESULT")
     # score("/Users/De_Filippo/Desktop/esperimentoMARKET-1501/scorefile.csv","02","MARKET-1501")
 
     """scorec3,truec3= arraycorr("/Users/De_Filippo/Desktop/esCHUCK-03/scorefile.csv","02")
