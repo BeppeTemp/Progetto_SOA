@@ -305,7 +305,8 @@ def processo_script_sequence_file(seqfilepath='',dest=''):
     j = 0
 
     for item in ijson.items(f, "item"):
-        print("Elaborazione " + str(j))
+        if j % 5000 == 0:
+            print("Elaborazione " + str(j))
         j = j + 1 
 
         parts=from_json_to_list_2(item)
@@ -315,20 +316,21 @@ def processo_script_sequence_file(seqfilepath='',dest=''):
         img=cv2.imread('temp.jpg')
         result.close()
 
-        img2, l_crop = bounding_box(img, parts)
-        imgcrop = crop(l_crop)
+        if img is not(None):
+            img2, l_crop = bounding_box(img, parts)
+            imgcrop = crop(l_crop)
 
-        for x in range(len(imgcrop)):
-            #dest = dest + "/" +str(item[i]['id']) + "sog_" + str(x)+".jpg"
-            dest="temp.jpg"
-            #imgcrop[x].save(dest)
-            imgcrop[x].save(dest)
-            f_binary=open(dest,'rb')
-            f_result.write("\"")
-            f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
-            f_result.write("\"")
-            f_result.write(",")
-            #dest = dest2
+            for x in range(len(imgcrop)):
+                #dest = dest + "/" +str(item[i]['id']) + "sog_" + str(x)+".jpg"
+                dest="temp.jpg"
+                #imgcrop[x].save(dest)
+                imgcrop[x].save(dest)
+                f_binary=open(dest,'rb')
+                f_result.write("\"")
+                f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
+                f_result.write("\"")
+                f_result.write(",")
+                #dest = dest2
         
     f_result.write(']')
     f_result.close()
