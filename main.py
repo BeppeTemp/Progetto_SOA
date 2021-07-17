@@ -12,8 +12,27 @@ import math
 import time
 from time import gmtime, strftime
 from sklearn import metrics
-
-
+import base64
+import matplotlib.pyplot as plt
+def from_json_to_list_2(json):
+    people = json['people']
+    l = [[[0.0, 0.0]]*int(len(people[0]['pose_keypoints_2d'])/3)
+         for i in range(int(len(people)))]
+    """for q in range(len(l)):
+        print(len(l[q]))"""
+    for x in range(len(people)):
+        person_point = people[x]['pose_keypoints_2d']
+        for y in range(int(len(person_point)/3)):
+            z = y*3
+            l[x].insert(y, [person_point[z], person_point[z+1]])
+        """while y<(int(len(person_point)-2)):
+            e=int(y/3)
+            #print(person_point[y])
+            l[x][e].insert(0,person_point[y])
+            l[x][e].insert(1,person_point[y + 1])
+            y=y+3
+        y=0"""
+    return l
 def from_json_to_list(path):
     file = open(path)
     data = json.load(file)
@@ -36,8 +55,8 @@ def from_json_to_list(path):
             y=y+3
         y=0"""
     return l
-
-
+def convertToImage(sbase64):
+    return base64.b64decode(sbase64)
 def build_rect(img, point1=[], point2=[], p=""):
     img2 = img
 
@@ -94,8 +113,6 @@ def build_rect(img, point1=[], point2=[], p=""):
     img_rot = cv2.warpAffine(img2, M, (img2.shape[1], img2.shape[0]))
     img_crop = cv2.getRectSubPix(img_rot, rect2[1], center)
     return img, img_crop
-
-
 def bounding_box(img, l=[]):
     people = len(l)
     l1 = []
@@ -179,8 +196,6 @@ def bounding_box(img, l=[]):
         l2.append(l1)
         l1 = []
     return img, l2
-
-
 def parse_dir(path=''):
 
     l = []
@@ -193,8 +208,6 @@ def parse_dir(path=''):
                 l2.append(filename)
                 filepath = ''
     return l, l2
-
-
 def cropvecchia(l_crop=[]):
     """for x in range(len(l_crop)):
         # conc=l[x][0]
@@ -228,8 +241,6 @@ def cropvecchia(l_crop=[]):
                 imgv.paste(img1, (y * width, 0))
             l.append(imgv)
     return l
-
-
 def crop(l_crop=[]):
     """for x in range(len(l_crop)):
         # conc=l[x][0]
@@ -264,10 +275,7 @@ def crop(l_crop=[]):
                 imgv.paste(img1, (y * 110, 0))
             l.append(imgv)
     return l
-
 # viene utilizzato processoscript
-
-
 def processo():
     filepath = input("inserisci filepath json: ")
     l = from_json_to_list(filepath)
@@ -288,6 +296,51 @@ def processo():
     cv2.imshow("titttt",result)
     cv2.waitKey(0)"""
     imgcrop.save(dest)
+def processo_script_sequence_file(seqfilepath='',dest='/Users/Maxio96/Desktop/Progetto_SOA/RESULT'):
+    f=open(seqfilepath,'r')
+    fjson=json.load(f)
+    f.close()
+    """
+    print(fjson[0]['image'])
+    print(fjson[0]['people'][0]['pose_keypoints_2d'])
+    print(fjson[0]['people'])
+    img=convertToImage(fjson[0]['image'])
+    result=open("result.jpg", "wb")
+    result.write(convertToImage(fjson[0]["image"]))
+    print("result", result)
+    result2=cv2.imread('result.jpg')
+    print(result2)
+    print(img)
+    """
+    dest2=dest
+    f_result=open('result.json','w')
+    f_result.write('[')
+    for i in range (len(fjson)):
+        parts=from_json_to_list_2(fjson[i])
+        result=open("result.jpg", "wb")
+        result.write(convertToImage(fjson[i]["image"]))
+        img=cv2.imread('result.jpg')
+        img2, l_crop = bounding_box(img, parts)
+        imgcrop = crop(l_crop)
+        for x in range(len(imgcrop)):
+            dest = dest + "/" +str(fjson[i]['id']) + "sog_" + str(x)+".jpg"
+            dest3="RESULT/temp.jpg"
+            if (i % 50000 == 0):
+                print(i)
+            imgcrop[x].save(dest)
+            imgcrop[x].save(dest3)
+            f_binary=open(dest3,'rb')
+            f_result.write("\"")
+            f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
+            f_result.write("\"")
+            print(len(fjson))
+            print(i)
+            if(i != len(fjson)-1):
+                f_result.write(",")
+            dest = dest2
+    f_result.write(']')
+    f_result.close()
+    strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
 
 
 def processoscript(jsonpathdir, imagepathdir, dest):
@@ -297,17 +350,19 @@ def processoscript(jsonpathdir, imagepathdir, dest):
     for i in range(len(l2)):
         parts = from_json_to_list(l[i])
         img = cv2.imread(l2[i])
+        #print("img",img)
         img2, l_crop = bounding_box(img, parts)
+        #print("lcrop",l_crop)
         #cv2.imshow("titt", img2)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
         imgcrop = crop(l_crop)
         for x in range(len(imgcrop)):
             dest = dest+"/"+lname[i][:-15]+"sog_"+str(x)+".jpg"
-	    if i % 50000 == 0:
-		print(i)
+            if (i % 50000 == 0):
+                print(i)
             imgcrop[x].save(dest)
             dest = dest2
-	strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
+    strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
 
 
 def arraycorr(filepath, str):
@@ -410,9 +465,10 @@ def score(pathcsv, mode, titds):
     plt.show()
 
 
+
 if __name__ == "__main__":
-    processoscript(jsonpathdir="/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/JSON",
-                   imagepathdir="/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/IMAGE", dest="/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/RESULT")
+    #processoscript(jsonpathdir='/Users/Maxio96/Desktop/Progetto_SOA/JSON',imagepathdir='/Users/Maxio96/Desktop/Progetto_SOA/IMAGE', dest="/Users/Maxio96/Desktop/Progetto_SOA/RESULT")
+    processo_script_sequence_file('/Users/Maxio96/Desktop/Progetto_SOA/RESULT/DataSet.json')
     # score("/Users/De_Filippo/Desktop/esperimentoMARKET-1501/scorefile.csv","02","MARKET-1501")
 
     """scorec3,truec3= arraycorr("/Users/De_Filippo/Desktop/esCHUCK-03/scorefile.csv","02")

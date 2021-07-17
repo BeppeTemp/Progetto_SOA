@@ -14,7 +14,7 @@ def convertToImage(sbase64):
 def createSingleJSON(fname, img_list):
     #Apro il file JSON iniziale e lo converto in oggetto python
     with open(json_path + fname + "_keypoints.json", "r") as json_file:
-        j =  json.loads(json_file.read())
+        j = json.loads(json_file.read())
 
     #Aggiungo il campo image
     if fname+".jpg" in img_list:
