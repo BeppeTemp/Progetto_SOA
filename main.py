@@ -5,6 +5,7 @@ from sklearn import metrics
 import cv2
 import numpy as np
 import json
+import ijson
 import os
 from PIL import Image
 import pandas as pd
@@ -14,6 +15,7 @@ from time import gmtime, strftime
 from sklearn import metrics
 import base64
 import matplotlib.pyplot as plt
+
 def from_json_to_list_2(json):
     people = json['people']
     l = [[[0.0, 0.0]]*int(len(people[0]['pose_keypoints_2d'])/3)
@@ -296,48 +298,38 @@ def processo():
     cv2.imshow("titttt",result)
     cv2.waitKey(0)"""
     imgcrop.save(dest)
-def processo_script_sequence_file(seqfilepath='',dest='/Users/Maxio96/Desktop/Progetto_SOA/RESULT'):
-    f=open(seqfilepath,'r')
-    fjson=json.load(f)
-    f.close()
-    """
-    print(fjson[0]['image'])
-    print(fjson[0]['people'][0]['pose_keypoints_2d'])
-    print(fjson[0]['people'])
-    img=convertToImage(fjson[0]['image'])
-    result=open("result.jpg", "wb")
-    result.write(convertToImage(fjson[0]["image"]))
-    print("result", result)
-    result2=cv2.imread('result.jpg')
-    print(result2)
-    print(img)
-    """
-    dest2=dest
-    f_result=open('result.json','w')
+def processo_script_sequence_file(seqfilepath='',dest=''):
+    f_result=open(dest + 'result.json','w')
     f_result.write('[')
-    for i in range (len(fjson)):
-        parts=from_json_to_list_2(fjson[i])
-        result=open("result.jpg", "wb")
-        result.write(convertToImage(fjson[i]["image"]))
-        img=cv2.imread('result.jpg')
+    f = open(seqfilepath + "DataSet.json", "r")
+    j = 0
+
+    for item in ijson.items(f, "item"):
+        print("Elaborazione " + str(j))
+        j = j + 1 
+
+        parts=from_json_to_list_2(item)
+
+        result=open("temp.jpg", "wb")
+        result.write(convertToImage(item["image"]))
+        img=cv2.imread('temp.jpg')
+        result.close()
+
         img2, l_crop = bounding_box(img, parts)
         imgcrop = crop(l_crop)
+
         for x in range(len(imgcrop)):
-            dest = dest + "/" +str(fjson[i]['id']) + "sog_" + str(x)+".jpg"
-            dest3="RESULT/temp.jpg"
-            if (i % 50000 == 0):
-                print(i)
+            #dest = dest + "/" +str(item[i]['id']) + "sog_" + str(x)+".jpg"
+            dest="temp.jpg"
+            #imgcrop[x].save(dest)
             imgcrop[x].save(dest)
-            imgcrop[x].save(dest3)
-            f_binary=open(dest3,'rb')
+            f_binary=open(dest,'rb')
             f_result.write("\"")
             f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
             f_result.write("\"")
-            print(len(fjson))
-            print(i)
-            if(i != len(fjson)-1):
-                f_result.write(",")
-            dest = dest2
+            f_result.write(",")
+            #dest = dest2
+        
     f_result.write(']')
     f_result.close()
     strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
@@ -468,11 +460,11 @@ def score(pathcsv, mode, titds):
 
 if __name__ == "__main__":
     #processoscript(jsonpathdir='/Users/Maxio96/Desktop/Progetto_SOA/JSON',imagepathdir='/Users/Maxio96/Desktop/Progetto_SOA/IMAGE', dest="/Users/Maxio96/Desktop/Progetto_SOA/RESULT")
-    processo_script_sequence_file('/Users/Maxio96/Desktop/Progetto_SOA/RESULT/DataSet.json')
+    processo_script_sequence_file("", "")
     # score("/Users/De_Filippo/Desktop/esperimentoMARKET-1501/scorefile.csv","02","MARKET-1501")
 
     """scorec3,truec3= arraycorr("/Users/De_Filippo/Desktop/esCHUCK-03/scorefile.csv","02")
-    scorec1,truec1 = arraycorr("/Users/De_Filippo/Desktop/esperimentoCHUCK-01/scorefile.csv","01")
+    scorec1,truec1 = arraycorr("/Users/De_Filippo/Desktop/esperimentoCHUCK-01/scorefile.csv",sdsd"01")
     scorem, truem = arraycorr("/Users/De_Filippo/Desktop/esperimentoMARKET-1501/scorefile.csv","02")
     fprc3,tprc3,thresholdsc3= metrics.roc_curve(truec3,scorec3)
     fnrc3=1-tprc3
