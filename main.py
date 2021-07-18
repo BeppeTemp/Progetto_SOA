@@ -301,7 +301,7 @@ def processo():
 def processo_script_sequence_file(seqfilepath='',dest=''):
     f_result=open(dest + 'result.json','w')
     f_result.write('[')
-    f = open(seqfilepath + "DataSet.json", "r")
+    f = open(seqfilepath + "DataSetPic.json", "r")
     j = 0
 
     for item in ijson.items(f, "item"):
