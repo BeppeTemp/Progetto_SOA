@@ -1,0 +1,1 @@
+spark-submit --class "SimpleApp" --master yarn --deploy-mode cluster --num-executors 8 --executor-cores 7 --executor-memory 25g target/scala-2.12/simple-project_2.12-1.0.jar 
