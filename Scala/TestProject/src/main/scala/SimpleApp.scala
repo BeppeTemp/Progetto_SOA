@@ -2,7 +2,7 @@ import org.apache.spark.sql.SparkSession
 
 object SimpleApp {
   def main(args: Array[String]) {
-    val logFile = "test2.txt" // Should be some file on your system
+    val logFile = "DataSet.json" // Should be some file on your system
     val spark = SparkSession.builder.appName("Simple Application").getOrCreate()
     val logData = spark.read.textFile(logFile).cache()
     val numAs = logData.filter(line => line.contains("a")).count()
