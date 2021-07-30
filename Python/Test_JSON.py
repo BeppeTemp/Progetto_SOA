@@ -279,12 +279,12 @@ def processo_script_sequence_file(seqfilepath='',dest=''):
 
 def processoscript_final(json):
     
-    f_result=open('result.json','a')
+    #f_result=open('result.json','a')
     parts = from_json_to_list_2(json)
-    result=open("temp.jpg", "wb")
-    result.write(convertToImage(json["image"]))
+    #result=open("temp.jpg", "wb")
+    #result.write(convertToImage(json["image"]))
     img=cv2.imread('temp.jpg')
-    result.close()
+    #result.close()
 
     if img is not(None):
         
@@ -294,14 +294,15 @@ def processoscript_final(json):
         for x in range(len(imgcrop)):
             dest="temp.jpg"
             imgcrop[x].save(dest)
-            f_result.write('{\"Image\":')
+            #f_result.write('{\"Image\":')
             f_binary=open(dest,'rb')
-            f_result.write("\"")
-            f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
-            f_result.write("\"")
-            f_result.write("}\n")
-    f_result.close()
+            #f_result.write("\"")
+            #f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
+            #f_result.write("\"")
+            #f_result.write("}\n")
+    #f_result.close()
     strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
+
 def processoscript(jsonpathdir, imagepathdir, dest):
     l, lname = parse_dir(jsonpathdir)
     l2, l2name = parse_dir(imagepathdir)
@@ -420,14 +421,10 @@ def exploreDataSet(df):
     data = df.select("id","image","people","version").rdd.map(lambda row: row.asDict()).collect()
     
     for d in data:
-        """
-        print(d["id"])
-        print(d["image"])
-        print(d["version"])
-        print(d["people"][0]["person_id"])
-        """
         processoscript_final(d)
-    print("Tutto Eseguito Stronzi")
+
+    print("Esecuzione completata")
+
 if __name__ == "__main__":
     # Definizione della Spark_Session
     spark = SparkSession \
@@ -436,7 +433,7 @@ if __name__ == "__main__":
         .getOrCreate()
 
     # Caricamento del dataset
-    df = spark.read.json("Arienzo-Giordano-Scotti/DataSetPic.json")
+    df = spark.read.json("Arienzo-Giordano-Scotti/DataSetMid.json")
         
     print()
     exploreDataSet(df)

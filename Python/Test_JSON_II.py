@@ -2,6 +2,8 @@ from posixpath import split
 from pyspark import rdd
 from pyspark.sql import SparkSession
 from pyspark.sql.types import Row
+def rowAsDict(row):
+    return row.asDict()
 
 def exploreDataSet(data):
     for d in data:
@@ -20,8 +22,10 @@ if __name__ == "__main__":
     # Caricamento del dataset
     df = spark.read.json("Arienzo-Giordano-Scotti/DataSetPic.json")
     print()
-    df.select("id","image","people","version").rdd.map(lambda row: exploreDataSet(row.asDict()))
+    #df.select("id","image","people","version").rdd.map(exploreDataSet())
+    data = df.select("id","image","people","version").rdd
+    print(data)
     print()
-
-
     spark.stop()
+
+
