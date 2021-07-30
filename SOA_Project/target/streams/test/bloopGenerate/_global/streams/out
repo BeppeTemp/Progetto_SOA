@@ -1,0 +1,4 @@
+[debug] [soa_project-test] Classpath dependencies List()
+[debug] [soa_project-test] Dependencies from configurations List(soa_project)
+[debug] Bloop wrote the configuration of project 'soa_project-test' to '/home/soa/Arienzo_Scotti_Giordano/Progetto_SOA/SOA_Project/.bloop/soa_project-test.json'
+[success] Generated .bloop/soa_project-test.json

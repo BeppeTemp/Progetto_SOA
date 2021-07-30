@@ -1,5 +1,1 @@
-spark-submit --class "SimpleApp" --master yarn --deploy-mode cluster --num-executors 8 --executor-cores 7 --executor-memory 25g target/scala-2.12/simple-project_2.12-1.0.jar
-
-spark-submit --master yarn --num-executors 8 --executor-cores 7 --executor-memory 25g 
-
-spark-submit --master yarn --num-executors 8 --executor-cores 7 --executor-memory 25g Python_Examples/pi.py 999999
+spark-submit --class "SOA_Project" --master yarn --deploy-mode client --num-executors 8 --executor-cores 7 --executor-memory 25g target/scala-2.12/soa_project_2.12-1.0.jar 
