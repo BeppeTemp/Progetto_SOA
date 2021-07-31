@@ -24,7 +24,7 @@ public class SOA_Project {
 
     //Creazione java bean per la definizione dello schema del DataSet
 		Encoder<DataSetRow> dataSetEncoder = Encoders.bean(DataSetRow.class);
-    String path = "Arienzo-Giordano-Scotti/DataSetPic.json";
+    String path = "Arienzo-Giordano-Scotti/DataSet.json";
 
     Dataset<DataSetRow> dataset = spark.read().json(path).as(dataSetEncoder);
 
@@ -34,7 +34,7 @@ public class SOA_Project {
 
     JavaRDD<String> result = sc.parallelize(images);
 
-    result.saveAsTextFile("Arienzo-Giordano-Scotti/result.txt");
+    result.saveAsObjectFile("Arienzo-Giordano-Scotti/result.txt");
 
     //Iterazione del DataSet
     dataset.foreach((ForeachFunction<DataSetRow>) row -> System.out.println(row.getId()));
