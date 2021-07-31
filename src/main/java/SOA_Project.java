@@ -1,6 +1,9 @@
+import java.util.List;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 public class SOA_Project {
@@ -14,7 +17,9 @@ public class SOA_Project {
 
     Dataset<DataSetRow> dataset = spark.read().json(path).as(dataSetEncoder);
 
-    dataset.show();
+    List<DataSetRow> json = (List<DataSetRow>) dataset.take(2);
+
+    System.out.println(json.get(1).getImage());
 
     spark.stop();
   }
