@@ -31,6 +31,8 @@ public class SOA_Project {
 
     dataset.toJavaRDD().foreach(row -> dataSetProcessing(row, images));
 
+    images.add(new ResultRow("ciaoooooo c'è nessuno ?"));
+
     Dataset<ResultRow> resultRdd = spark.createDataset(images, resultEncoder);
 
     resultRdd.write().format("json").save("Arienzo-Giordano-Scotti/prego.json");
