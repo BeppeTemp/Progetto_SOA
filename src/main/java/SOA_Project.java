@@ -34,9 +34,9 @@ public class SOA_Project {
     images.add(new ResultRow("ciaoooooo c'è nessuno ?"));
     images.add(new ResultRow(dataset.first().getImage()));
 
-    Dataset<ResultRow> resultRdd = spark.createDataset(images, resultEncoder);
+    Dataset<ResultRow> result = spark.createDataset(images, resultEncoder);
 
-    resultRdd.write().format("json").save("Arienzo-Giordano-Scotti/prego.json");
+    result.repartition(1).write().format("json").save("Arienzo-Giordano-Scotti/prego.json");
 
     sc.close();
     spark.stop();
