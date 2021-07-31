@@ -1,10 +1,14 @@
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+
+import org.apache.spark.api.java.function.ForeachFunction;
 
 public class SOA_Project {
   public static void main(String[] args) {
@@ -17,9 +21,7 @@ public class SOA_Project {
 
     Dataset<DataSetRow> dataset = spark.read().json(path).as(dataSetEncoder);
 
-    List<DataSetRow> json = (List<DataSetRow>) dataset.take(2);
-
-    System.out.println(json.get(1).getImage());
+    dataset.foreach((ForeachFunction<DataSetRow>) row -> System.out.println(row));
 
     spark.stop();
   }
