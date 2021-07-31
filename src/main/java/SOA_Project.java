@@ -29,9 +29,10 @@ public class SOA_Project {
 
     List<ResultRow> images = new ArrayList<ResultRow>();
 
-    dataset.toJavaRDD().foreach(row -> dataSetProcessing(row, images));
+    //dataset.toJavaRDD().foreach(row -> dataSetProcessing(row, images));
 
     images.add(new ResultRow("ciaoooooo c'è nessuno ?"));
+    images.add(new ResultRow(dataset.first().getImage()));
 
     Dataset<ResultRow> resultRdd = spark.createDataset(images, resultEncoder);
 
