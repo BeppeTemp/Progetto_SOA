@@ -29,14 +29,14 @@ public class SOA_Project {
 
     List<ResultRow> images = new ArrayList<ResultRow>();
 
-    dataset.toJavaRDD().foreach(row -> images.add(new ResultRow(row.getImage())));
+    dataset.toJavaRDD().collect().forEach(row -> images.add(new ResultRow(row.getImage())));
 
     //images.add(new ResultRow("ciaoooooo c'è nessuno ?"));
     //images.add(new ResultRow(dataset.first().getImage()));
 
     Dataset<ResultRow> result = spark.createDataset(images, resultEncoder);
 
-    result.repartition(1).write().format("json").save("Arienzo-Giordano-Scotti/prego.json");
+    result.repartition(1).write().format("json").save("Arienzo-Giordano-Scotti/result.json");
 
     sc.close();
     spark.stop();
