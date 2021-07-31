@@ -1,1 +1,1 @@
-spark-submit --class "SOA_Project" --master yarn --deploy-mode client --num-executors 8 --executor-cores 7 --executor-memory 25g target/scala-2.12/soa_project_2.12-1.0.jar 
+spark-submit --class "SOA_Project" --master yarn --deploy-mode client --num-executors 8 --executor-cores 7 --executor-memory 25g target/soa-project-1.0.jar
