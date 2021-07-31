@@ -19,8 +19,7 @@ public class SOA_Project {
 
   public static void main(String[] args) {
     SparkSession spark = SparkSession.builder().appName("SOA Project").getOrCreate();
-    SparkConf conf = new SparkConf().setAppName("SOA Project").setMaster("yarn");
-    JavaSparkContext sc = new JavaSparkContext(conf);
+    JavaSparkContext sc = new JavaSparkContext();
 
     //Creazione java bean per la definizione dello schema del DataSet
 		Encoder<DataSetRow> dataSetEncoder = Encoders.bean(DataSetRow.class);
