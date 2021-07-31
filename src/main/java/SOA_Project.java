@@ -7,14 +7,12 @@ import org.apache.spark.sql.Encoders;
 
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.ForeachFunction;
 
 public class SOA_Project {
   
-  public static void dataSetProcessing(DataSetRow row, List<String> images){
-    images.add(row.getImage());
+  public static void dataSetProcessing(DataSetRow row, List<ResultRow> images){
+    images.add(new ResultRow(row.getImage()));
   } 
 
   public static void main(String[] args) {
@@ -24,20 +22,18 @@ public class SOA_Project {
 
     //Creazione java bean per la definizione dello schema del DataSet
 		Encoder<DataSetRow> dataSetEncoder = Encoders.bean(DataSetRow.class);
+    Encoder<ResultRow> resultEncoder = Encoders.bean(ResultRow.class);
     String path = "Arienzo-Giordano-Scotti/DataSet.json";
 
     Dataset<DataSetRow> dataset = spark.read().json(path).as(dataSetEncoder);
 
-    List<String> images = new ArrayList<String>();
+    List<ResultRow> images = new ArrayList<ResultRow>();
 
     dataset.toJavaRDD().foreach(row -> dataSetProcessing(row, images));
 
-    JavaRDD<String> result = sc.parallelize(images);
+    Dataset<ResultRow> resultRdd = spark.createDataset(images, resultEncoder);
 
-    result.saveAsObjectFile("Arienzo-Giordano-Scotti/result.txt");
-
-    //Iterazione del DataSet
-    dataset.foreach((ForeachFunction<DataSetRow>) row -> System.out.println(row.getId()));
+    resultRdd.write().format("json").save("Arienzo-Giordano-Scotti/prego.json");
 
     sc.close();
     spark.stop();
