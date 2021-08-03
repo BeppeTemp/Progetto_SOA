@@ -5,7 +5,10 @@ import numpy as np
 
 from PIL import Image
 from time import gmtime, strftime
+
 from pyspark.sql import SparkSession
+from pyspark import SparkContext, SparkConf
+from pyspark.sql.types import ArrayType, StringType, StructField, StructType
 
 def from_json_to_list(json):
     people = json['people']
@@ -17,10 +20,8 @@ def from_json_to_list(json):
             z = y*3
             l[x].insert(y, [person_point[z], person_point[z+1]])
     return l
-
 def convertToImage(sbase64):
     return base64.b64decode(sbase64)
-
 def build_rect(img, point1=[], point2=[], p=""):
     img2 = img
 
@@ -77,7 +78,6 @@ def build_rect(img, point1=[], point2=[], p=""):
     img_rot = cv2.warpAffine(img2, M, (img2.shape[1], img2.shape[0]))
     img_crop = cv2.getRectSubPix(img_rot, rect2[1], center)
     return img, img_crop
-
 def bounding_box(img, l=[]):
     people = len(l)
     l1 = []
@@ -159,7 +159,6 @@ def bounding_box(img, l=[]):
         l2.append(l1)
         l1 = []
     return img, l2
-
 def crop(l_crop=[]):
     l = []
     for x in range(len(l_crop)):
@@ -179,45 +178,67 @@ def crop(l_crop=[]):
                 imgv.paste(img1, (y * 110, 0))
             l.append(imgv)
     return l
-
-def processoscript_final(json):
-    f_result=open('result.json','a')
-    parts = from_json_to_list(json)
+def processoScript_final(row):
+    parts = from_json_to_list(row)
     result=open("temp.jpg", "wb")
-    result.write(convertToImage(json["image"]))
+    result.write(convertToImage(row["image"]))
     img=cv2.imread('temp.jpg')
     result.close()
 
     if img is not(None):
-        
         img2, l_crop = bounding_box(img, parts)
         imgcrop = crop(l_crop)
 
         for x in range(len(imgcrop)):
             dest="temp.jpg"
             imgcrop[x].save(dest)
-            f_result.write('{\"Image\":')
             f_binary=open(dest,'rb')
-            f_result.write("\"")
-            f_result.write(str(base64.b64encode(f_binary.read()))[1:].replace("'",""))
-            f_result.write("\"")
-            f_result.write("}\n")
-    f_result.close()
-    strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
-
+            row["image"] = str(base64.b64encode(f_binary.read()))[1:].replace("'","")
+    
+    return row
+    
 if __name__ == "__main__":
-    # Definizione della Spark_Session
-    spark = SparkSession \
-        .builder \
-        .appName("Python Spark SQL basic example") \
-        .getOrCreate()
+    conf = SparkConf().setAppName("SOA Project").setMaster("yarn")
+    sc = SparkContext(conf=conf)
+    spark = SparkSession.builder.getOrCreate()
 
-    # Caricamento del dataset
-    df = spark.read.json("Arienzo-Giordano-Scotti/DataSet.json")
-        
-    print()
-    data = df.select("id","image","people","version").rdd.map(processoscript_final).take(1)
+    #Caricamento dataset
+    data = spark.read.json("Arienzo-Giordano-Scotti/DataSet.json")
+
+    #Estrapolazione dati
+    source = data.select("id","image","people","version")
+    
+    #Elaborazione del dataset
+    result = source.rdd.map(lambda row: (processoScript_final(row.asDict())))
+
+    #Definizione schema
+    person = StructType([ \
+        StructField("person_id",StringType(),True), \
+        StructField("pose_keypoints_2d",StringType(),True), \
+        StructField("face_keypoints_2d",StringType(),True), \
+        StructField("hand_left_keypoints_2d", StringType(), True), \
+        StructField("hand_right_keypoints_2d", StringType(), True), \
+        StructField("pose_keypoints_3d", StringType(), True), \
+        StructField("face_keypoints_3d", StringType(), True), \
+        StructField("hand_left_keypoints_3d", StringType(), True), \
+        StructField("hand_right_keypoints_3d", StringType(), True), \
+    ])
+    schema = StructType([ \
+        StructField("id",StringType(),True), \
+        StructField("image",StringType(),True), \
+        StructField("person",ArrayType(person),True), \
+        StructField("version", StringType(), True), \
+    ])
+
+    #Creazione del file dei result
+    result = spark.createDataFrame(result, schema)
+
+    #Filtraggio file dei result
+    result = result.select("image")
+
+    #Salvataggio file dei result
+    result.repartition(1).write.format("json").save("Arienzo-Giordano-Scotti/result.json")
+    #result.show()
+
     print("Esecuzione completata")
-    print()
-
     spark.stop()
