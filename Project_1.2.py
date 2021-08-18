@@ -203,7 +203,7 @@ if __name__ == "__main__":
     spark = SparkSession.builder.getOrCreate()
 
     #Caricamento dataset
-    data = spark.read.json("Arienzo-Giordano-Scotti/DataSetPic.json")
+    data = spark.read.json("Arienzo-Giordano-Scotti/DataSet.json")
 
     #Estrapolazione dati
     source = data.select("id","image","people","version")
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     result = result.select("image")
 
     #Salvataggio file dei result
-    result.repartition(1).write.format("json").save("Arienzo-Giordano-Scotti/result.json")
+    result.write.format("json").mode('overwrite').save("Arienzo-Giordano-Scotti/result.json")
     #result.show()
 
     print("Esecuzione completata")
